@@ -5,6 +5,10 @@ on:
     branches:
       - main
       - extend-tests
+  pull_request:
+    branches:
+      - main
+      - extend-tests
 
 jobs:
   style_check:
@@ -29,16 +33,11 @@ jobs:
         run: |
           cmake -S . -B build
           cmake --build build
-      - name: Prepare Artifact
-        run: |
-          mkdir -p build/data build/tests
-          cp data/m3.csv build/data/
-          cp tests/testconfig.yml build/tests/
-      - name: Upload Build Artifact
+      - name: Upload Binary
         uses: actions/upload-artifact@v4
         with:
-          name: build-output
-          path: build/
+          name: testsidemade-binary
+          path: build/testsidemade
 
   test:
     runs-on: ubuntu-latest
@@ -49,12 +48,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libeigen3-dev libboost-test-dev libyaml-cpp-dev
-      - name: Download Build Artifact
+      - name: Download Binary
         uses: actions/download-artifact@v4
         with:
-          name: build-output
+          name: testsidemade-binary
           path: . 
       - name: Run Tests
         run: |
-          chmod +x build/testsidemade
-          ./build/testsidemade
+          chmod +x testsidemade
+          # Run from root so 'tests/testconfig.yml' and 'data/m3.csv' are found
+          ./testsidemade
