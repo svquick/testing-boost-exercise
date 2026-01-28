@@ -1,3 +1,4 @@
+[![SSE CI/CD](https://github.com/svquick/testing-boost-exercise/actions/workflows/test.yaml/badge.svg)](https://github.com/svquick/testing-boost-exercise/actions/workflows/test.yaml)
 # SIDEMADE - Simple Dense Matrix Decomposition
 
 A simple demo code to read dense matrices from files and solve linear systems with them.
