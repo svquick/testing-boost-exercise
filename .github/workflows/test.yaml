@@ -53,9 +53,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: build/
+          path: . 
       - name: Run Tests
         run: |
-          chmod +x build/testsidemade  # Ensure the binary is executable
-          cd build
-          ctest --output-on-failure
+          chmod +x build/testsidemade
+          ./build/testsidemade
