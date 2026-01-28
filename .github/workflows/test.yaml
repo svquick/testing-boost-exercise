@@ -12,8 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install clang-format
-        run: sudo apt-get install -y clang-format
-      - name: Check formatting
+        run: sudo apt-get update && sudo apt-get install -y clang-format
+      - name: Verify Formatting
         run: |
           find src tests -name "*.cpp" -o -name "*.hpp" | xargs clang-format --dry-run --Werror
 
@@ -25,10 +25,20 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libeigen3-dev libboost-test-dev libyaml-cpp-dev
-      - name: Configure CMake
-        run: cmake -S . -B build
-      - name: Build project
-        run: cmake --build build
+      - name: Configure and Build
+        run: |
+          cmake -S . -B build
+          cmake --build build
+      - name: Prepare Artifact
+        run: |
+          mkdir -p build/data build/tests
+          cp data/m3.csv build/data/
+          cp tests/testconfig.yml build/tests/
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: build/
 
   test:
     runs-on: ubuntu-latest
@@ -39,11 +49,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libeigen3-dev libboost-test-dev libyaml-cpp-dev
-      - name: Configure and Build
-        run: |
-          cmake -S . -B build
-          cmake --build build
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: build/
       - name: Run Tests
         run: |
+          chmod +x build/testsidemade  # Ensure the binary is executable
           cd build
           ctest --output-on-failure
